@@ -2,11 +2,28 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+favorite_characters = db.Table('favorite_characters',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('characters_id', db.Integer, db.ForeignKey('characters.id'), primary_key=True)
+)
+
+favorite_planets= db.Table('favorite_planets',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('planets_id', db.Integer, db.ForeignKey('planets.id'), primary_key=True)
+)
+
+favorite_vehicles = db.Table('favorite_vehicles',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('vehicles_id', db.Integer, db.ForeignKey('vehicles.id'), primary_key=True)
+)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    favorite_character = db.relationship("Characters", secondary=favorite_characters)
+    favorite_planet = db.relationship("Planets", secondary=favorite_planets)
+    favorite_vehicle = db.relationship("Vehicles", secondary=favorite_vehicles)
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -88,7 +105,7 @@ class Vehicles(db.Model):
 
 
     def __repr__(self):
-        return '<Vehicles %r>' % self.model
+        return '<Vehicles %r>' % self.name
 
     def serialize(self):
         return {
