@@ -1,126 +1,76 @@
-from flask_sqlalchemy import SQLAlchemy
+import os
+import sys
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import create_engine
+# from eralchemy2 import render_er
 
-db = SQLAlchemy()
+Base = declarative_base()
 
-favorite_characters = db.Table('favorite_characters',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('characters_id', db.Integer, db.ForeignKey('characters.id'), primary_key=True)
-)
+class User(Base):
+    __tablename__ = 'user'
+    # Here we define columns for the table person
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    favorites = relationship("Favorites", backref="user")
 
-favorite_planets= db.Table('favorite_planets',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('planets_id', db.Integer, db.ForeignKey('planets.id'), primary_key=True)
-)
-
-favorite_vehicles = db.Table('favorite_vehicles',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('vehicles_id', db.Integer, db.ForeignKey('vehicles.id'), primary_key=True)
-)
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    favorite_character = db.relationship("Characters", secondary=favorite_characters)
-    favorite_planet = db.relationship("Planets", secondary=favorite_planets)
-    favorite_vehicle = db.relationship("Vehicles", secondary=favorite_vehicles)
-
-    def __repr__(self):
-        return '<User %r>' % self.email
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            # do not serialize the password, its a security breach
-        }
-class Characters(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    hair_color = db.Column(db.String(80))
-    eye_color = db.Column(db.String(80))
-    height = db.Column(db.Integer)
-    mass = db.Column(db.Integer)
-    gender = db.Column(db.String(80))
-    birth_year = db.Column(db.String)
-    skin_color = db.Column(db.String)
-
-    def __repr__(self):
-        return '<Characters %r>' % self.name
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "hair_color": self.hair_color,
-            "eye_color": self.eye_color,
-            "height": self.height,
-            "mass": self.mass,
-            "gender": self.gender,
-            "birth_year": self.birth_year,
-            "skin_color": self.skin_color,
-            # do not serialize the password, its a security breach
-        }
-class Planets(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    rotation_period = db.Column(db.Integer)
-    orbital_period = db.Column(db.Integer)
-    diameter = db.Column(db.Integer)
-    climate = db.Column(db.String(80))
-    gravity = db.Column(db.String(80))
-    terrain = db.Column(db.String(80))
-    surface_water = db.Column(db.Integer)
-    population = db.Column(db.Integer)
-
-    def __repr__(self):
-        return '<Planets %r>' % self.name
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "rotation_period": self.rotation_period,
-            "orbital_period": self.orbital_period,
-            "diameter": self.diameter,
-            "climate": self.climate,
-            "gravity": self.gravity,
-            "terrain": self.terrain,
-            "surface_water": self.surface_water,
-            "population": self.population,
-            # do not serialize the password, its a security breach
-        }
-class Vehicles(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    model = db.Column(db.String(80))
-    manufacturer = db.Column(db.String(80))
-    cost_in_credits = db.Column(db.Integer)
-    length = db.Column(db.Integer)
-    max_atmosphering_speed = db.Column(db.Integer)
-    passengers = db.Column(db.Integer)
-    cargo_capacity = db.Column(db.Integer)
-    consumables = db.Column(db.String(80))
-    vehicle_class = db.Column(db.String(80))
+    
+  
+class Favorites(Base):
+    __tablename__ = 'favorites'
+    id = Column(Integer, primary_key=True)
+    favorite_characters = Column(Integer(250), ForeignKey('characters.id'))
+    favorite_planet = Column(Integer(250), ForeignKey('planet.id'))
+    favorite_vehicle = Column(Integer(250), ForeignKey('vehicle.id'))
+    user_id = Column(Integer(250)), ForeignKey('user.id')
 
 
-    def __repr__(self):
-        return '<Vehicles %r>' % self.name
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "model": self.model,
-            "manufacturer": self.manufacturer,
-            "cost_in_credits": self.cost_in_credits,
-            "length": self.length,
-            "max_atmosphering_speed": self.max_atmosphering_speed,
-            "passengers": self.passengers,
-            "cargo_capacity": self.cargo_capacity,
-            "consumables": self.consumables,
-            "vehicle_class": self.vehicle_class,
-            
 
-            # do not serialize the password, its a security breach
-        }
+class Character(Base):
+    __tablename__ = 'character'
+    # Here we define columns for the table address.
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    height = Column(Integer)
+    hair_color = Column(String(250))
+    skin_color = Column(String(250))
+    gender = Column(String(250))
+    birth_year = Column(Integer)  
+    homeworld = Column(String(250)) 
+    favorite = relationship('favorites', backref="characters") 
+    # person = relationship(Person)
+
+
+class Planet(Base):
+    __tablename__ = 'planet'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    climate = Column(String(250))
+    population = Column(Integer)
+    terrain = Column(String(250))
+    rotation_period = Column(Integer)
+    favorite = relationship('favorites', backref='planet')
+    
+
+class Vehicle(Base):
+    __tablename__ = 'vehicle'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    model = Column(String(250))
+    manufacturer = Column(String(250))
+    cost_in_credits = Column(Integer)
+    passengers = Column(Integer)
+    starship_class = Column(String(250))
+    favorite = relationship('favorites', backref='vehicle')
+
+
+
+
+    def to_dict(self):
+        return {}
+
+## Draw from SQLAlchemy base
+render_er(Base, 'diagram.png')
