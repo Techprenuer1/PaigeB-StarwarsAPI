@@ -20,10 +20,10 @@ class User(Base):
 class Favorites(Base):
     __tablename__ = 'favorites'
     id = Column(Integer, primary_key=True)
-    favorite_characters = Column(Integer(250), ForeignKey('characters.id'))
-    favorite_planet = Column(Integer(250), ForeignKey('planet.id'))
-    favorite_vehicle = Column(Integer(250), ForeignKey('vehicle.id'))
-    user_id = Column(Integer(250)), ForeignKey('user.id')
+    favorite_characters = Column(Integer, ForeignKey('characters.id'))
+    favorite_planet = Column(Integer, ForeignKey('planet.id'))
+    favorite_vehicle = Column(Integer, ForeignKey('vehicle.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
 
 
 
@@ -73,4 +73,4 @@ class Vehicle(Base):
         return {}
 
 ## Draw from SQLAlchemy base
-render_er(Base, 'diagram.png')
+# render_er(Base, 'diagram.png')
